@@ -1,0 +1,3 @@
+先cmd 当前文件夹
+
+pyinstaller -F xx.py
