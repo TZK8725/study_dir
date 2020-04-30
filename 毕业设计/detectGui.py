@@ -26,6 +26,7 @@ class DetectWindows(QMainWindow):
 
     def initUI(self):
 
+        """初始化窗口组件"""
         self.setWindowTitle("智能控制系统仿真")
         self.resize(1200, 700)
         self.setMaximumSize(1200, 700)
@@ -34,10 +35,12 @@ class DetectWindows(QMainWindow):
         self.bodyButton = QPushButton("行人检测", self)
         self.signButton = QPushButton("交通标志识别", self)
         startButton = QPushButton("开始", self)
+
         self.faceButton.move(100, 600)
         self.bodyButton.move(250, 600)
         self.signButton.move(400, 600)
         startButton.move(550, 600)
+
         cameraLabel = QLabel("<font size=5 face='Monaco'>Video:</font>", self)
         detectLabel = QLabel("<font size=5 face='Monaco'>Detect:</font>", self)
         kunLabel = QLabel("<font size=5 face='Monaco'>By Kun</font>", self)
@@ -49,15 +52,13 @@ class DetectWindows(QMainWindow):
         self.resultLabel = QLabel(self)
         self.resultLabel.move(800, 500)
         self.resultLabel.resize(400, 60)
+
         self.status_bar = QStatusBar()
         self.setStatusBar(self.status_bar)
-        # self.status_bar.move(50, 650)
-        # self.status_bar.resize()
         self.detectButton = QPushButton("识别", self)
         self.detectButton.move(1000, 350)
         self.detectButton.hide()
         self.detectButton.clicked.connect(self.faceMatch)
-
 
         kunLabel.move(1000, 650)
         cameraLabel.move(20, 20)
@@ -77,8 +78,8 @@ class DetectWindows(QMainWindow):
         # self.setWindowOpacity(0.95)
 
     def videoShow(self):
-        """摄像头读取"""
 
+        """摄像头读取"""
         ret = 1
         cap = cv2.VideoCapture(0)
         self.signButton.setEnabled(True)
@@ -104,6 +105,7 @@ class DetectWindows(QMainWindow):
 
     def changeDetectClass(self):
 
+        # 改变识别模式
         self.detectImageLabel.clear()
         self.resultLabel.clear()
         self.detectButton.hide()
@@ -118,6 +120,7 @@ class DetectWindows(QMainWindow):
 
     def faceDetect(self, image):
 
+        """人脸检测"""
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         hist_image = cv2.equalizeHist(gray)
         faces = self.classifier.detectMultiScale(hist_image, scaleFactor=1.1, minNeighbors=5, minSize=(48, 48))
@@ -132,6 +135,7 @@ class DetectWindows(QMainWindow):
 
     def bodyDetect(self, image):
 
+        """行人检测"""
         h, w, c = image.shape
         detect_image = cv2.resize(image, (int(w / 2), int(h / 2)))
         locations, weights = self.hog.detectMultiScale(detect_image, scale=1.09, winStride=(8, 8))
@@ -147,6 +151,7 @@ class DetectWindows(QMainWindow):
 
     def signDetect(self, image):
 
+        """交通标志检测"""
         img_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         mask1 = cv2.inRange(img_hsv, np.array([0, 46, 46]), np.array([10, 255, 255]))
         mask2 = cv2.inRange(img_hsv, np.array([156, 46, 46]), np.array([180, 255, 255]))
@@ -181,6 +186,7 @@ class DetectWindows(QMainWindow):
 
     def sign_recongnition(self, sign_image):
 
+        """交通标志识别"""
         img = cv2.resize(sign_image, (64, 64))
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         feature = hog(gray)
@@ -190,6 +196,7 @@ class DetectWindows(QMainWindow):
 
     def faceMatch(self):
 
+        """人脸匹配"""
         cv2.imwrite("./unknown.jpg", self.current_image)
         face = baiduface.BaiduFace()
         verify_score, face_token, access_token = face.face_verify("./unknown.jpg")
